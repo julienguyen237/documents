@@ -1,0 +1,234 @@
+# Mai Protocol v3: Giao thức hoán đổi vĩnh viễn không được phép dựa trên Công cụ tạo lập thị trường tự động nâng cao  
+
+
+## 1. Giới thiệu
+Mai Protocol v3 được thiết kế bởi MCDEX là một giao thức hoán đổi hợp đồng vĩnh viễn  phi tập trung dựa trên công cụ tạo lập thị trường tự động nâng cao AMM. Hoán đổi hợp đồng vĩnh viễn là một trong những công cụ phái sinh phổ biến nhất không có ngày hết hạn, hỗ trợ giao dịch ký quỹ và giá của nó ổn định so với giá chỉ số. 
+
+Mục tiêu của giao thức này là cho phép bất kỳ ai cũng có thể tạo và giao dịch trên các thị trường hợp đồng vĩnh viễn. Đầu tiên, mọi người có thể tạo thị trường hợp đồng vĩnh viễn riêng của mình với mức giá dưới tài sản và chọn bất kì token ERC20 nào để làm vật thế chấp. Thứ hai, chúng tôi đã thiết kế một cơ chế tạo lập thị trường tự động cho thị trường hợp đồng vĩnh viễn và cơ chế này có hiệu quả vốn tốt hơn. Hơn nữa, cơ chế tạo lập thị trường tự động này giải quyết được các vấn đề thanh khoản - bất kì ai cũng có thể cung cấp thanh khoản cho cơ chế tạo lập tự động bằng cách gửi tài sản vào pool thanh khoản và chọn thị trường hợp lý để tạo ra lợi nhuận. Cuối cùng, bất kì ai cũng có thể giao dịch hoán đổi hợp đồng vĩnh viễn không được phép. Tài sản của người giao dịch trong hợp đồng thông minh theo cách không độc lập và quá trình giao dịch được thực hiện hoàn toàn ở trên chuỗi.
+
+Hợp đồng thông minh của giao thức được kiểm toán chặt chẽ bởi bên thứ ba, tối đa hoá sự phi tập trung, tính bảo mật của giao thức và không có quản trị viên chính của mỗi giao thức. 
+
+Chúng tôi tin rằng sự không được phép chính là đặc điểm chủ chốt của giao thức, điều này có thể trao quyền cho toàn bộ cộng đồng để đóng góp cho hệ sinh thái MCDEX - bất cứ ai cũng có thể tạo thị trường hợp đồng vĩnh viễn của tài sản tổng hợp trong chuỗi và ngoài chuỗi. Với sự phát triển của cộng đồng MCDEX, ngày càng đa dạng thị trường hợp đồng vĩnh viễn được tạo ra và lượng giao dịch ngày càng nhiều hơn. 
+
+## 2. Hoán đổi hợp đồng vĩnh viễn
+### 2.1. Người tham gia thị trường
+Giao thức này hoàn toàn dựa trên cơ chế tạo lập thị trường tự động AMM. Mời mọi người tham khảo tài liệu thiết kế cho MAI v3 và AMM để nắm được nhiều thông tin chi tiết hơn về AMM. 
+
+Dưới đây là các vai trò chính trong thị trường: 
+
+#### AMM
+
+AMM đóng vai trò quan trọng là đối tác trung tâm, cung cấp thanh khoản hoán đổi hợp đồng vĩnh viễn. Giống như một người giao dịch bình thường, AMM có tài khoản ký quỹ độc lập và có thể giữ các vị thế hiện tại. 
+
+#### Người vận hành
+
+Người vận hành là một người vận hành là người tạo ra và quản lý hoán đổi hợp đồng vĩnh viễn. 
+
+- Làm thế nào để trở thành một người vận hành hợp đồng vĩnh viễn: 
+- Tạo hoán đổi hợp đồng vĩnh viễn và cài đặt các thông số ban đầu (ví dụ tỷ lệ ký quỹ, tham số rủi ro AMM,...). Công cụ tạo lập hoán đổi hợp đồng vĩnh viễn tự động có một tập hợp các tham số rủi ro. Bằng việc điều chỉnh các thông số này, người điều hành có thể thay đổi rủi ro tạo ra thị trường của AMM, độ trượt giá và mức chênh lệch.,.
+
+- Thanh toán (cung cấp) cho dịch vụ Oracle. Giao thức sẽ xác định một giao diện Oracle để Oracle đang có sẵn có thể được áp dụng trong giao thức. Một người điều hành có thể cung cấp dữ liệu Oracle của riêng họ để hoán đổi hợp đồng vĩnh viễn. 
+
+- Người vận hành có thể đặt một loạt các tham số rủi ro và điều chỉnh các tham số rủi ro trong phạm vi này. 
+
+- Người vận hành có thể bắt đầu quá trình quản trị để thay đổi phạm vi thông số rủi ro (xem thêm mục 2.10 - Thông số AMM và quản trị)
+
+- Người vận hành có thể chuyển giao vai trò của mình đến các địa chỉ khác và chọn không tham gia với vai trò là người điều hành. Thị trường hợp đồng vĩnh viễn không có người điều hành sẽ được quản lý bởi LP (Liquidity Provider) - nhà cung cấp thanh khoản.
+
+- Lợi ích:
+
+- Có được lợi nhuận từ mọi giao dịch bằng cách tính phí quản lý do chính người vận hành đặt ra.
+- Sự khuyến khích được phân phối cho một số pool tiềm năng thực hiện tốt.
+- khởi xướng đề xuất quản trị AMM
+
+- Rủi ro: Không thể ứng dụng
+
+#### Nhà cung cấp thanh khoản:
+- Làm thế nào để trở thành nhà cung cấp thanh khoản 
+- Gửi tài sản thế chấp trong trong pool AMM.
+
+- Lợi ích:
+- Phí giao dịch theo tỉ lệ cố định
+- Lợi nhuận từ chênh lệch và trượt giá
+- Tiền trả quỹ được trả bởi các nhà giao dịch
+- Phạt thanh lý
+- Ưu đãi được phân phối cho các pool AMM tiềm năng (xem thêm phần 3.2 -  tokennomics)
+vi. Các nhà cung cấp thanh khoản có thể tham gia vào quản trị AMM (xem phần 2.10 các thông số và quản trị AMM)
+
+- Rủi ro: 
+
+- Khi AMM đang ở trong một vị thế nào đó sẽ có rủi ro có thể xảy ra. Nếu các chỉ số giá thay đổi lúc này, có thể sẽ có một khoản lỗ trên AMM. Khoản lỗ này sẽ được chia sẻ bởi tất cả các nhà cung cấp thanh khoản. 
+
+### Nhà giao dịch
+Các nhà giao dịch là những người tham gia chính trong thị trường này. Các nhà giao dịch nhận ra PNL bằng cách giao dịch chống lại AMM và họ sẽ luôn luôn là người dẫn đầu. Trong giao thức này, tất cả các giao dịch phải thông qua AMM, và các nhà giao dịch không thể bỏ qua AMM để giao dịch với nhau. Đối với mọi giao dịch, các nhà giao dịch cần trả một khoản phí giao dịch nhất định. Ngoài ra, nhà giao dịch sẽ thanh toán hoặc nhận tiền tài trợ thanh toán theo chính sách tỷ lệ tài trợ.
+
+#### Keeper
+Keeper là một vai trò phụ trợ. Bất kỳ ai cũng có thể là keeper để thanh lý tài khoản  (xem phần 2.4 thanh lý).
+
+#### Người uỷ quyền
+Mỗi người uỷ quyền giữ một vai trò đặc biệt riêng. Có một người uỷ quyền cho mọi giao dịch ký quỹ. Một người uỷ quyền có thể điều hành các tài khoản để giao dịch (trực tiếp đi ngược lại AMM hoặc qua một nhà môi giới), nhưng họ không thể rút tiền từ tài khoản. Mục tiêu của người uỷ quyền là tách biệt ví nóng và ví lạnh, đồng thời có thể nhận ra sự giám hộ của các chiến lược giao dịch. 
+
+### 2.2.   Thanh toán quỹ
+Tương tự với hoán đổi hợp đồng vĩnh viễn truyền thống, giao thức này sử dụng thanh toán quỹ để giữ chỉ số giá. 
+
+Vì tất cả các giao dịch phải thông qua AMM, thị trường đạt đến sự cân bằng khi AMM không có bất kỳ vị thế nào. Tại thời điểm này AMM sẽ cung cấp giá thầu tốt nhất và giá chào bán tốt nhất.
+
+Giá AMM thay đổi theo vị thế của nó. Khi AMM ở vị thế long, giá AMM sẽ thấp hơn giá chỉ số và ngược lại với trường hợp AMM short. Nói cách khác, thị trường đã hết cân bằng tại thời điểm này, vì vậy giá thị trường sẽ thay đổi tương đương với chỉ số. Trong trường hợp này, giao thức sẽ tính phí thanh toán quỹ từ các vị thế đối diện với AMM và các nhà giao dịch với vị thế tương tự AMM cũng sẽ nhận được khoản thanh toán quỹ. AMM luôn nhận thanh toán quỹ miễn là nó đang ở một vị thế nào đó. Tỷ lệ tài trợ tương quan thuận với quy mô vị thế của AMM, tức là AMM càng nắm giữ nhiều vị thế, thì giá thị trường càng lệch, gây ra một khoản thanh toán tài trợ cao hơn. 
+	
+Mặt khác, thanh toán quỹ có thể ngăn chặn nhiều nhà giao dịch trở thành đối tác của AMM, việc này có thể dẫn đến sự chênh lệch giá hơn nữa. Trong khi đó, tỉ lệ tài trợ cao sẽ thu hút thêm nhiều nhà cung cấp thanh khoản để thêm thanh khoản hoặc mở cùng một vị thế với AMM. Dựa trên thiết kế AMM, cả việc thêm thanh khoản vào AMM hay giao dịch ngược lại AMM đều dẫn đến việc giảm quy mô của vị thế, từ đó dẫn đến thay đổi về chênh lệch giá. Theo cách đó, thanh toán quỹ sẽ đẩy giá thị trường về mức chỉ số. 
+
+### 2.3. Margin và PNL
+Do tính chất không được phép của giao thức này, bất kỳ ai cũng có thể tạo ra bất kỳ hành động hoán đổi hợp đồng vĩnh viễn nào với mức độ rủi ro khác nhau. Để ngăn chặn rủi ro lan truyền qua các giao dịch khác nhau, giao thức sử dụng cơ chế ký quỹ riêng biệt - mỗi giao dịch hoán đổi hợp đồng vĩnh viễn thuộc sở hữu của một nhà giao dịch có tài khoản ký quỹ độc lập của riêng mình và PNL của tài khoản này sẽ không ảnh hưởng đến ký quỹ khác tài khoản mà họ giao dịch.
+
+Khi một nhà giao dịch tham gia vào vị thế mua hoặc bán của 𝑁 hợp đồng ở một mức giá nhập nhất định 𝑃𝑒𝑛𝑡𝑟𝑦, 𝑁> 0 cho biết nhà giao dịch đang mua vào, 𝑁 <0 cho biết nhà giao dịch bán khống.
+
+Khi mở vị thế, số dư ký quỹ trong tài khoản ký quỹ của nhà giao dịch phải lớn hơn hoặc bằng ký quỹ ban đầu:
+
+  P_mark·|ΔN|·R_im
+
+𝑃_𝑚𝑎𝑟𝑘 là giá đánh dấu được cung cấp bởi Oracle. `𝑃_𝑚𝑎𝑟𝑘 thường bằng giá chỉ số `𝑃_𝑖𝑛𝑑𝑒𝑥 hoặc là kết quả TWAP của 𝑃𝑖𝑛𝑑𝑒𝑥 khi sử dụng một số Oracle phi tập trung như Uniswap. Rim là tỷ lệ ký quỹ ban đầu của hợp đồng vĩnh viễn.
+
+PNL (Lãi và lỗ) của vị thế được tính như sau:
+(P_mark-P_entry)·ΔN	
+
+Lợi nhuận của vị thế hợp đồng vĩnh viễn MCDEX có thể được rút bất kỳ lúc nào, tức là  "PNL" luôn đề cập đến trạng thái đã nhận ra. Và khoản lỗ của vị thế được trừ vào số dư ký quỹ trong thời gian thực.
+
+Nhà giao dịch có thể đóng vị thế ở mức giá thoát 𝑃𝑒𝑥𝑖𝑡. PNL sau khi nhà giao dịch đóng vị thế được tính bằng:
+ (P_exit-P_entry)·ΔN	
+
+Nhà giao dịch phải đảm bảo rằng số dư ký quỹ của tài khoản ký quỹ luôn lớn hơn hoặc bằng ký quỹ duy trì:
+P_mark·ΔN·M_mm
+
+Nếu không thể đáp ứng yêu cầu ký quỹ duy trì, vị thế sẽ bị thanh lý.
+
+Cuối cùng, mọi giao dịch hoán đổi hợp đồng vĩnh viễn đều có thông số “Phần thưởng phí gas của keeper". Khi vị thế được thanh lý, người giữ sẽ nhận được một lượng phần thưởng nhất định để trả phí Gas. Do đó, miễn là kích thước vị thế của tài khoản ký quỹ lớn hơn 0 (không tính đến giá trị vị thế), số dư ký quỹ phải đủ cho thông số “Phần thưởng phí gas của keeper" thì tài khoản sẽ không bị thanh lý.
+
+### 2.4. Thanh toán
+Khi số dư ký quỹ nhỏ hơn số tiền ký quỹ duy trì, vị thế sẽ được thanh lý.
+Người giữ tiền bắt đầu thanh lý đối với các vị thế không đủ ký quỹ. Bất cứ ai cũng có thể hành động như một keeper. Có hai cách thanh lý:
+
+- Thanh lý qua AMM: Vị thế thanh lý sẽ được đóng lại qua AMM, có nghĩa là
+vị thế này được chuyển cho AMM. Tiền phạt thanh lý cũng được tính vào pool thanh khoản của AMM.
+
+- Keeper sẽ nhận được một lượng "Phần thưởng phí gas của keeper".
+Do keeper tiếp quản, vị thế đã thanh lý sẽ được chuyển cho keeper. Trong trường hợp này, keeper sẽ chấp nhận rủi ro vị thế và nhận tiền phạt thanh lý.
+
+### 2.5. Quyết toán
+Mặc dù đây là một giao dịch hoán đổi vĩnh viễn, nhưng có thể xảy ra tình trạng thiếu thanh khoản trong các tình huống cực đoan. Nếu có tổn thất thanh lý do thiếu thanh khoản AMM hoặc thanh lý chậm, bảo hiểm quỹ AMM sẽ ưu tiên bù đắp lỗ thanh lý. Nếu quỹ bảo hiểm AMM là không đủ, hợp đồng sẽ bước vào giai đoạn quyết toán. Giao dịch hoán đổi vĩnh viễn sẽ kết thúc muộn nhất
+giá chỉ số và tài sản còn lại sẽ được phân phối cho các nhà giao dịch theo số tiền ký quỹ của họ. Điều này có nghĩa là khoản lỗ do thanh lý được thực hiện bởi tất cả các nhà giao dịch nắm giữ vị thế dựa trên số dư ký quỹ. Đối với những người không có bất kỳ vị thế nào, họ sẽ không bị tính phí lỗ thanh lý. Chúng tôi tin rằng trong những trường hợp khắc nghiệt, việc giải quyết kịp thời cũng như việc cho phép các nhà giao dịch rút tiền ký quỹ sẽ bảo vệ tất cả các bên. Cơ chế này là một dạng ngắt mạch.
+
+Bên cạnh đó, khi Oracle không cung cấp các bản cập nhật trong hơn 24 giờ, hợp đồng cũng sẽ được giải quyết.
+
+Có hai giai đoạn giải quyết. Thứ nhất là "Khẩn cấp", trong đó Oracle sẽ
+ngừng cập nhật. Tại thời điểm này, người giữ sẽ xem xét tất cả các tài khoản ký quỹ và nhận được phần thưởng. Trong quá trình xem xét, số dư ký quỹ sẽ được tính toán dựa trên
+giá thanh toán. Khi quá trình xem xét hoàn tất, việc giải quyết chuyển sang giai đoạn thứ hai được gọi là "Đã xóa". Các nhà giao dịch sau đó có thể rút số tiền ký quỹ còn lại.
+
+### 2.6. Quỹ bảo hiểm
+Mỗi giao dịch hoán đổi vĩnh viễn đi kèm với một quỹ bảo hiểm để thanh toán cho tổn thất do thanh lý.
+
+Bất kỳ ai cũng có thể quyên góp cho quỹ bảo hiểm. Chúng tôi khuyến khích các nhà khai thác quyên góp cho vốn ban đầu và bổ sung quỹ bảo hiểm khi hợp đồng thực hiện.
+
+Khi vị thế của nhà giao dịch bị thanh lý do không đủ ký quỹ, một tỷ lệ nhất định (dựa trên các tham số AMM) của khoản phạt thanh lý đã tính phí sẽ được chuyển vào quỹ bảo hiểm. Các phần còn lại chuyển cho người thanh lý (AMM hoặc thủ tục). Mọi quỹ bảo hiểm đều có quỹ kích thước tối đa. Khi đạt đến kích thước tối đa này, quỹ mới được bổ sung sẽ đi vào pool thanh khoản của AMM. LP có thể tăng giới hạn trên này thông qua quản trị, nhưng không thể giảm xuống.
+
+### 2.7. Giới hạn & lệnh dừng
+Giao dịch với AMM tương tự như đặt lệnh thị trường vào sổ lệnh truyền thống. Bên trong trường hợp hoán đổi hợp đồng vĩnh viễn, mọi người thường có xu hướng tìm kiếm cơ hội và kiểm soát giá thông qua các lệnh giới hạn. Bên cạnh đó, Lệnh dừng là một công cụ quan trọng đối với các giao dịch có đòn bẩy cao. Do đó, chúng tôi đã thiết kế các lệnh giới hạn và lệnh dừng tương đối tập trung. 
+
+Nhà giao dịch có thể ký một lệnh giới hạn hoặc lệnh dừng và gửi lệnh đến máy chủ “Nhà môi giới” được ủy thác. Máy chủ môi giới sẽ quan sát giá AMM trên chuỗi và gửi lệnh tới hợp đồng khi giá AMM đáp ứng yêu cầu của lệnh. Khi hợp đồng thông minh nhận được lệnh từ Nhà môi giới, lệnh đó sẽ được tiếp tục sau khi xác minh tính hợp lệ.
+
+Hãy nhớ rằng Nhà môi giới sẽ không khớp với các lệnh đã nhận, vì vậy tất cả các lệnh sẽ được giao dịch chống lại AMM theo thứ tự dịch vụ đầu tiên. Nhà môi giới sẽ tính phí Gas cho các nhà giao dịch.
+
+### 2.8. Bảo mật
+Chúng tôi hoàn toàn hiểu rằng bảo mật là yếu tố quan trọng của loại giao thức này. Trước khi được xuất bản, tất cả các hợp đồng và bản cập nhật sẽ trải qua quá trình kiểm tra nghiêm ngặt. Thiết kế cấu trúc tài chính của AMM cũng sẽ được xác minh.
+
+Để tối đa hóa đặc tính phi tập trung của giao thức này, không có khóa quản trị nào ở trong mã.
+
+Mặc dù các nhà khai thác có các đặc quyền hạn chế đối với hoán đổi hợp đồng vĩnh viễn, nhưng ở một mức độ tăng cường bảo mật, các nhà giao dịch cần cẩn thận lựa chọn các giao dịch mà họ muốn giao dịch và giao dịch với rủi ro của riêng họ. Chúng tôi khuyến khích các nhà khai thác chọn Oracles phi tập trung và giới hạn các thông số rủi ro trong một phạm vi nhỏ hơn (hoặc đặt các thông số cố định), để độ tin cậy có thể tăng lên.
+
+### 2.9. Giới thiệu
+Phí giới thiệu được hỗ trợ trong giao thức này. Người giới thiệu sẽ nhận được một lượng giới thiệu nhất định từ phí nhà vận hành và phí LP khi keeper của họ giao dịch với AMM hoặc thông qua người môi giới. Tỷ lệ phí giới thiệu này sẽ do Ban quản trị AMM quy định. Theo cách đó, thể chế các nhà đầu tư có thể thu lợi từ việc giới thiệu các nhà giao dịch đến AMM bằng cách chạy giao diện người dùng của riêng họ.
+
+### 2.10. Các thông số và quản trị của AMM
+Các tham số AMM có hai loại: loại có thể thay đổi và loại không thể thay đổi.
+Người vận hành và LP có thể điều chỉnh các thông số có thể thay đổi bằng cách bỏ phiếu. AMM có một nhóm rủi ro và mỗi tham số có một phạm vi hiệu quả. Theo thị trường, nhà điều hành có thể tự do điều chỉnh các thông số rủi ro trong phạm vi hiệu quả. Một thủ tục bỏ phiếu được yêu cầu nếu có một nhu cầu để thay đổi phạm vi.
+
+Người điều hành có thể bắt đầu một đề xuất. Nếu không có hoạt động nào trong việc hoán đổi hợp đồng vĩnh viễn, LP với hơn 1% chia sẻ cũng có thể bắt đầu đề xuất. Mỗi đề xuất sẽ được tiến hành bằng cách bỏ phiếu trong số LP sở hữu token trước khi đề xuất được bắt đầu. Số phiếu đại biểu phải nhiều hơn 10% tổng số cổ phiếu LP. Thời gian biểu quyết kéo dài 72 giờ và giải pháp có thể trở nên hiệu quả sau 24 giờ. Khi bỏ phiếu, cần staking token LP. Nếu đề xuất được thông qua, token LP đã bỏ phiếu sẽ được mở khóa sau 72 giờ kể từ việc thực hiện đề xuất; token LP đã bỏ phiếu sẽ được mở khóa ngay lập tức. 
+
+Nếu đề xuất không thành công, tất cả token LP sẽ được mở khóa ngay sau khoảng thời gian bỏ phiếu. Khi một LP bắt đầu một đề xuất, hệ thống sẽ tự động ghi lại phiếu bầu của họ là "có" và khóa token LP của họ lại.
+
+
+| Thông số AMM | Định nghĩa | Có thể thay đổi/ Không thể thay đổi |
+|--------------|------------|-------------------------------------|
+| Tài sản cơ bản | Một chuỗi xác định tài sản cơ bản | Không thể thay đổi |
+| Địa chỉ mã thế chấp | Địa chỉ token ERC20 thế chấp | Không thể thay đổi |
+| Địa chỉ điều hành | Địa chỉ điều hành | Có thể thay đổi bởi nhà điều hành |
+| Địa chỉ bộ điều hợp Oracle | Địa chỉ bộ chuyển đổi tương thích cho Oracle Mai3 | Không thay đổi được |
+| Tỷ lệ ký quỹ ban đầu | Xác định giá trị đòn bẩy tối đa khi mở vị thế | Có thể thay đổi bởi LP Governance |
+| Tỷ lệ ký quỹ duy trì | Xác định đòn bẩy khi vị thế được thanh lý; Tỷ lệ ký quỹ nhỏ hơn ban đầu | Có thể thay đổi bởi LP Governance
+| Phí Vault | Tỷ lệ phí giao dịch vào DAO Vault | Có thể thay đổi bởi MCDEX DAO Governance|
+| Chi phí điều hành | Tỉ lệ phí giao dịch cho việc vận hành tổ chức thập hơn 1% | Có thể thay đổi bởi LP Governance
+| Phí LP | Tỉ lệ phí giao dịch của LP thấp hơn 1% | Có thể thay đổi bởi LP Governance |
+|Phí giới thiệu | Tỉ lệ phí giới thiếu đựợc lấy từ phí vận hành và phí LP | Có thể thay đổi bởi LP Governance |
+| Tỉ lệ phạt thanh lý tài khoản| Tỉ lệ phạt thanh lý tài khoản:Phạt thanh lý tài khoản= Định vị giá trị*Phạt thanh khoản, thấp hơn tỉ lệ biên bảo trì | Có thể thay đổi bởi LP Governance
+| Tỉ lệ quỹ bảo hiểm | Tỉ lệ phạt của quỹ bảo hiểm | Có thể thay đổi bởi LP Governance |
+| Quỹ bảo hiểm tối đa | Giới hạn trên của quỹ bảo hiểm | Có thể thay đổi bởi LP Governance |
+| Phần thưởng cho Keeper Gas | Khi keeper thực thi việc thanh lý hoặc đánh giá tài khoản trong quá trình thanh toán, họ sẽ nhận được một phần thưởng nhất định cho phí gas | Có thể thay đổi bởi LP Governance
+|Thông số rủi ro AMM | Một tập hợp các thông số giúp quản lý rủi ro của AMM như những người tạo nên thị trường | Phạm vi hiệu quả có thể thay đổi bởi nhà quản trị |
+
+Hãy chú ý đến thực tế là tất cả các tham số rủi ro đều có hiệu lực trong một phạm vi được chỉ định. Người vận hành có thể điều chỉnh các thông số trong phạm vi này mà không cần thông qua các thủ tục quản trị. Bằng cách đó, LP có thể ủy quyền cho nhà điều hành điều chỉnh các thông số rủi ro theo thị trường, điều này rất quan trọng ở giai đoạn đầu. Sau khi giao thức đã chạy được một thời gian và các tham số rủi ro dần ổn định, LP có thể cắt giảm phạm vi hiệu quả của các tham số rủi ro thông qua quản trị (hoặc thậm chí sửa các tham số) để tăng cường hơn nữa đặc tính phi tập trung của AMM.
+
+Ngoài các đề xuất sửa đổi các thông số AMM, có ba đề xuất yâu cầu tổng lượng phiếu bầu thấp hơn 20% tổng số cổ phần của LP.
+
+- Nâng cấp code của AMM smart contract
+- Thực hiện những hoán đổi hợp đồng vĩnh viễn vào giai đoạn thanh toán
+- Chỉ định một nhà điều hành. LP có thể bắt đầu những đề xuất chỉ khi không có một nhà điều hành nào.
+
+### 2.11. Triển khai Multi-chain
+MCDEX tin rằng các chuỗi công khai có người dùng và hệ sinh thái của riêng họ. Giao thức này sẽ giữ vị trí trung lập khi lựa chọn các chuỗi công khai. Để̉ tối đa hóa tính khả dụng của chúng tôi, các hợp đồng thông minh của những giao thức này có thể chạy trên nhiều chuỗi công khai. MCDEX DAO sẽ hỗ trợ cho sự phát triển của giao thức này trên những chuỗi công khai đó để có thể phát triển hơn nữa hệ sinh thái MCDEX.
+
+## 3. MCDEX DAO
+### 3.1. Cơ chế quản trị
+Cộng đồng MCDEX đã phát hành thông báo mã quản trị token MCB và đã hoàn thành một chuổi series quản trị. Khi khởi chạy giao thức của Mai3, chúng tôi sẽ thành lập MCDEX DAO dựa trên cơ sở MCB. MCDEX DAO sẽ trở thành yếu tố cốt lõi của cộng đồng MCDEX. Sứ mệnh của MCDAO là tiếp tục phát triển hệ sinh thái MCDEX.
+
+MCDEX DAO có kho lưu trữ tiền. Tài sản trong kho này đến từ:
+- Những chi phí thu được trên hệ sinh thái MCDEX
+- MCB mới phát hành thuộc MCB tokennomics
+- Những chi phí khác từ MCDEX DAO
+
+Những tài sản trong kho lưu trữ tiền sẽ được dùng để thưc̣ hiện các sứ mệnh của MCDEX DAO. Các ứng dụng cụ thể bao gồm các hoạt động không giới hạn dưới đây:
+
+- Khuyến khích thanh khoản: Các ưu đãi cho LP của AMM
+- Khuyến khích hoạt động quản trị: Ưu đãi dành cho những người nắm giữ MCB khi tham gia vào cộng ̣đồng quản trị.
+- Khuyến khích sự phát triển: Ưu đãi cho người mới và nhà quản lý trong cộng đồng
+- Phí kiểm tóan và các khoản phí bắt buộc khác
+- Thêm tính thanh khoản cho các sản phẩm trong hệ sinh thái MCDEX
+- Mua lại MCB từ thị trường thứ cấp và các MCB sẽ trở thành một phần trong lượng tài sản của kho tiền lưu trữ.
+- Cung cấp tính thanh khoản cho MCB (trong MCB liquidity pool của Uniswap)
+
+MCB holders đã có những quyền lợi quản trị của MCDEX DAO. MCDEX DAO đã áp dụng phương pháp “Thảo luận Off-chain, quản trị On-chain”. Kể từ khi có những chính sách quản trị trên chuỗi này, mỗi một giao thức về cơ bản đều là những smart contact có thể thực thi. MCDEX DAO nên cung cấp hợp đồng thông minh để dễ dàng đưa ra các đề xuất.
+
+Những chính sách quản trị MCDEX DAO bao gồm:
+- Quản lý lượng người dùng cụ thể của kho lưu trữ tài sản
+- Chạy nhiều giao dịch hoán đổi vĩnh viễn với vai trò là nhà điều hành
+- Bầu chọn địa chỉ multi-signature khi cần thiết. Địa chỉ này sẽ hoàn thành công việc đại diện của MCDEX như một nhà điều hành.
+- Nâng cấp MCDEX DAO smart contract
+
+Đề xuất quản trị MCDEX cần được khởi xướng bởi chủ sở hữu MCB và người khởi xướng quyền biểu quyết của MCB không dưới 1% tổng số đã phát hành và số đại biểu bỏ phiếu phải không dưới 10% tổng số đã phát hành. Người khởi xướng đề xuất được thiết lập để bỏ phiếu “có”. MCB keeper có thể ủy quyền quyền biểu quyết cho keeper khác.
+
+Thời gian bình chọn kéo dài 72 giờ và có khóa thời gian là 48 giờ. Người tham gia cần staking MCB. Nếu đề xuất được thông qua, MCB đã bỏ phiếu “đồng ý” sẽ được mở khóa sau 72 giờ kể từ khi thực hiện đề xuất này và MCB đã bỏ phiếu “không” sẽ được mở khóa ngay lập tức khi thời gian biểu quyết kết thúc. Nếu đề xuất không thành công, tất cả MCB đã stake sẽ được mở khóa ngay lập tức khi thời gian biểu quyết kết thúc.
+
+### 3.2. Tokenomics
+Tokenomics của MCB ban đầu có thể cải thiện: Lạm phát gia tăng nhanh chóng đã áp đảo các chủ sở hữu MCB. Do đó, chúng tôi sẽ thảo luận về MCB được nâng cấp tokenomics với cộng đồng trước khi ra mắt Mai phiên bản 3. Tokenomics bao gồm vấn đề về kích thước, vấn đề về đối tượng và tốc độ phát hành.
+
+Các nguyên tắc của tokenomics mới như sau:
+- Tiếp tục lưu hành những MCB đã phát hành.
+- MCB phải được nắm bắt từ hệ sinh thái MCDEX.
+- Do tầm quan trọng của tính thanh khoản trong các sản phẩm phái sinh, chúng tôi vẫn cần phát hành thêm MCB để khuyến khích thanh khoản.
+- Tokenomics mới phải tính đến lợi nhuận của chủ sở hữu MCB hiện tại.
+
+
+
+
+
+
+
+
